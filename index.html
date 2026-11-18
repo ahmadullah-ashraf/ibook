@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IBook - সোশাল মিডিয়া</title>
-    <!-- ফন্ট অসম এবং গুগল ফন্ট -->
+    <title>IBook - সোশাল নেটওয়ার্ক</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary-color: #1877f2;
@@ -15,15 +17,6 @@
             --text-color: #050505;
             --secondary-text: #65676b;
             --border-color: #ddd;
-        }
-
-        .dark-mode {
-            --primary-color: #2d88ff;
-            --bg-color: #18191a;
-            --card-bg: #242526;
-            --text-color: #e4e6eb;
-            --secondary-text: #b0b3b8;
-            --border-color: #393a3b;
         }
 
         * {
@@ -36,366 +29,404 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
         }
 
-        /* হেডার বা নবার */
+        /* অথেনটিকেশন ওভারলে */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-card h2 { color: var(--primary-color); margin-bottom: 20px; }
+        .auth-card input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+        }
+        .auth-card button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .auth-card p { cursor: pointer; color: var(--primary-color); font-size: 14px; }
+
+        /* মেইন লেআউট */
+        #main-app { display: none; }
         header {
             background-color: var(--card-bg);
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        .logo h1 { color: var(--primary-color); }
+        .user-panel { display: flex; align-items: center; gap: 15px; }
 
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .main-container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
 
-        .logo-area h1 {
-            color: var(--primary-color);
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .header-icons {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .icon-btn {
-            background: var(--bg-color);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-color);
-            font-size: 18px;
-            transition: 0.2s;
-        }
-
-        .icon-btn:hover {
-            background-color: var(--border-color);
-        }
-
-        /* মেইন কন্টেইনার */
-        .main-container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0 10px;
-        }
-
-        /* পোস্ট ক্রিয়েট বক্স */
-        .create-post-card {
-            background-color: var(--card-bg);
+        /* পোস্ট বক্স ও ফিড */
+        .card {
+            background: var(--card-bg);
             border-radius: 8px;
             padding: 15px;
+            margin-bottom: 15px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
         }
-
-        .post-input-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .post-input-row input {
-            flex: 1;
-            background-color: var(--bg-color);
+        .post-input textarea {
+            width: 100%;
             border: none;
-            padding: 10px 15px;
-            border-radius: 20px;
-            color: var(--text-color);
-            font-size: 15px;
             outline: none;
+            resize: none;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
-
-        .post-actions-row {
-            display: flex;
-            justify-content: space-around;
-            padding-top: 10px;
-        }
-
-        .action-option {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            color: var(--secondary-text);
-            font-weight: 500;
-            font-size: 14px;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        .action-option:hover {
-            background-color: var(--bg-color);
-        }
-
+        .post-footer { display: flex; justify-content: flex-end; }
         .post-btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 6px 20px;
+            padding: 8px 20px;
             border-radius: 5px;
-            font-weight: 600;
             cursor: pointer;
         }
 
-        /* নিউজফিড পোস্ট কার্ড */
-        .post-card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-            padding: 15px;
+        .post { margin-bottom: 20px; }
+        .post-header { display: flex; align-items: center; margin-bottom: 10px; }
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; margin-right: 10px;
         }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .user-info {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .user-info h4 {
-            font-size: 15px;
-            color: var(--text-color);
-        }
-
-        .user-info span {
-            font-size: 12px;
-            color: var(--secondary-text);
-        }
-
-        .post-body {
-            font-size: 15px;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .post-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--secondary-text);
+        .post-content { margin-bottom: 10px; line-height: 1.5; }
+        .post-actions {
+            display: flex; border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+            padding: 5px 0; margin-bottom: 10px;
+        }
+        .action-btn {
+            flex: 1; text-align: center; padding: 8px;
+            color: var(--secondary-text); cursor: pointer;
+            border-radius: 4px; transition: 0.2s;
+        }
+        .action-btn:hover { background-color: var(--bg-color); }
+        .action-btn.liked { color: var(--primary-color); font-weight: bold; }
+
+        /* কমেন্ট সেকশন */
+        .comment-section { margin-left: 20px; margin-top: 10px; }
+        .comment-input-wrap { display: flex; gap: 10px; margin-top: 5px; }
+        .comment-input-wrap input {
+            flex: 1; padding: 8px; border: 1px solid var(--border-color);
+            border-radius: 15px; outline: none; background: var(--bg-color);
+        }
+        .comment {
+            background: var(--bg-color);
+            padding: 8px 12px;
+            border-radius: 15px;
             margin-bottom: 5px;
-        }
-
-        .post-footer-actions {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .post-footer-actions button {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 8px;
-            cursor: pointer;
-            color: var(--secondary-text);
-            font-weight: 600;
             font-size: 14px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
+        .comment-author { font-weight: bold; margin-right: 5px; }
 
-        .post-footer-actions button:hover {
-            background-color: var(--bg-color);
+        /* মেসেঞ্জার ড্রয়ার */
+        #messenger-sidebar {
+            position: fixed; right: 0; top: 60px; width: 300px;
+            height: calc(100vh - 60px); background: var(--card-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+            transform: translateX(100%); transition: 0.3s;
         }
-
-        .post-footer-actions button.liked {
-            color: var(--primary-color);
+        #messenger-sidebar.open { transform: translateX(0); }
+        .chat-header {
+            padding: 10px; background: var(--primary-color);
+            color: white; font-weight: bold; text-align: center;
+        }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; }
+        .chat-input-wrap { display: flex; padding: 10px; border-top: 1px solid var(--border-color); }
+        .chat-input-wrap input {
+            flex: 1; padding: 8px; border: 1px solid var(--border-color);
+            border-radius: 15px; outline: none;
         }
     </style>
+
+    <!-- Firebase SDK Modular -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCu_k1-YRgHYbJEDsFwpqFwEq7mhd9dpHU",
+            authDomain: "ibook-b4ae1.firebaseapp.com",
+            projectId: "ibook-b4ae1",
+            storageBucket: "ibook-b4ae1.firebasestorage.app",
+            messagingSenderId: "36196287150",
+            appId: "1:36196287150:web:8ae8d4f0ee5bdc1105a33f",
+            measurementId: "G-NDLH5TZ3KT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // অথেনটিকেটর লজিক
+        window.toggleAuthMode = function(isLogin) {
+            document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('register-form').style.display = isLogin ? 'none' : 'block';
+        };
+
+        window.registerUser = async function() {
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const username = document.getElementById('reg-username').value;
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: username });
+                alert("রেজিস্ট্রেশন সফল হয়েছে!");
+            } catch (error) { alert(error.message); }
+        };
+
+        window.loginUser = async function() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) { alert(error.message); }
+        };
+
+        window.logoutUser = () => signOut(auth);
+
+        // স্টেট লিসেনার
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('user-display-name').innerText = user.displayName;
+                initAppFeatures();
+            } else {
+                document.getElementById('auth-overlay').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'none';
+            }
+        });
+
+        // মূল ফিচারসমূহ
+        function initAppFeatures() {
+            loadPosts();
+            loadMessages();
+        }
+
+        window.createPost = async function() {
+            const content = document.getElementById('post-text').value;
+            if(!content.trim()) return;
+            await addDoc(collection(db, "posts"), {
+                authorId: currentUser.uid,
+                authorName: currentUser.displayName,
+                content: content,
+                likes: [],
+                createdAt: new Date()
+            });
+            document.getElementById('post-text').value = '';
+        };
+
+        function loadPosts() {
+            const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const feed = document.getElementById('feed');
+                feed.innerHTML = '';
+                snapshot.forEach((docSnap) => {
+                    const post = docSnap.data();
+                    const postId = docSnap.id;
+                    const isLiked = post.likes.includes(currentUser.uid);
+                    
+                    const postEl = document.createElement('div');
+                    postEl.className = 'card post';
+                    postEl.innerHTML = `
+                        <div class="post-header">
+                            <div class="avatar">${post.authorName[0]}</div>
+                            <div><h4>${post.authorName}</h4></div>
+                        </div>
+                        <div class="post-content">${post.content}</div>
+                        <div class="post-actions">
+                            <div class="action-btn ${isLiked ? 'liked' : ''}" onclick="likePost('${postId}')">
+                                <i class="fa-thumbs-up ${isLiked ? 'fa-solid' : 'fa-regular'}"></i> লাইক (${post.likes.length})
+                            </div>
+                            <div class="action-btn" onclick="toggleComments('${postId}')">
+                                <i class="fa-regular fa-comment"></i> কমেন্ট
+                            </div>
+                        </div>
+                        <div class="comment-section" id="comments-${postId}" style="display:none;">
+                            <div id="comment-list-${postId}"></div>
+                            <div class="comment-input-wrap">
+                                <input type="text" id="comment-input-${postId}" placeholder="একটি কমেন্ট লিখুন...">
+                                <button onclick="addComment('${postId}')"><i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    feed.appendChild(postEl);
+                    loadComments(postId);
+                });
+            });
+        }
+
+        window.likePost = async function(postId) {
+            const postRef = doc(db, "posts", postId);
+            if(event.target.closest('.action-btn').classList.contains('liked')) {
+                await updateDoc(postRef, { likes: arrayRemove(currentUser.uid) });
+            } else {
+                await updateDoc(postRef, { likes: arrayUnion(currentUser.uid) });
+            }
+        };
+
+        window.toggleComments = function(postId) {
+            const el = document.getElementById(`comments-${postId}`);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.addComment = async function(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value;
+            if(!text.trim()) return;
+            await addDoc(collection(db, "posts", postId, "comments"), {
+                authorName: currentUser.displayName,
+                text: text,
+                createdAt: new Date()
+            });
+            input.value = '';
+        };
+
+        function loadComments(postId) {
+            const q = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const list = document.getElementById(`comment-list-${postId}`);
+                list.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const c = doc.data();
+                    list.innerHTML += `<div class="comment"><span class="comment-author">${c.authorName}:</span>${c.text}</div>`;
+                });
+            });
+        }
+
+        window.toggleMessenger = () => document.getElementById('messenger-sidebar').classList.toggle('open');
+
+        window.sendMessage = async function() {
+            const input = document.getElementById('chat-input');
+            const text = input.value;
+            if(!text.trim()) return;
+            await addDoc(collection(db, "messages"), {
+                sender: currentUser.displayName,
+                text: text,
+                createdAt: new Date()
+            });
+            input.value = '';
+        };
+
+        function loadMessages() {
+            const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const chatList = document.getElementById('chat-messages');
+                chatList.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const m = doc.data();
+                    chatList.innerHTML += `<div><b>${m.sender}:</b> ${m.text}</div>`;
+                });
+            });
+        }
+    </script>
 </head>
 <body>
 
-    <!-- হেডার বার -->
-    <header>
-        <div class="logo-area">
-            <h1>IBook</h1>
-        </div>
-        <div class="header-icons">
-            <button class="icon-btn" onclick="toggleDarkMode()" title="ডার্ক মোড পরিবর্তন করুন"><i class="fa-solid fa-moon"></i></button>
-            <div class="avatar" style="width: 35px; height: 35px; font-size: 14px;">আ</div>
-        </div>
-    </header>
-
-    <!-- মূল কন্টেন্ট ফিড -->
-    <div class="main-container">
-        
-        <!-- পোস্ট লেখার বক্স -->
-        <div class="create-post-card">
-            <div class="post-input-row">
-                <div class="avatar">আ</div>
-                <input type="text" id="postText" placeholder="আপনার মনে কী চলছে, আহমাদুল্লাহ?">
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <div style="display: flex; gap: 5px;">
-                    <button class="action-option"><i class="fa-solid fa-image" style="color: #45bd62;"></i> ছবি/ভিডিও</button>
-                    <button class="action-option"><i class="fa-solid fa-face-smile" style="color: #f7b125;"></i> অনুভূতি</button>
-                </div>
-                <button class="post-btn" onclick="addNewPost()">পোস্ট করুন</button>
-            </div>
+    <!-- অথেনটিকেশন ওভারলে -->
+    <div id="auth-overlay">
+        <!-- লগইন কার্ড -->
+        <div class="auth-card" id="login-form">
+            <h2>IBook লগইন</h2>
+            <input type="email" id="login-email" placeholder="ইমেইল">
+            <input type="password" id="login-password" placeholder="পাসওয়ার্ড">
+            <button onclick="loginUser()">লগইন</button>
+            <p onclick="toggleAuthMode(false)">নতুন অ্যাকাউন্ট খুলতে এখানে ক্লিক করুন</p>
         </div>
 
-        <!-- নিউজফিড সেকশন -->
-        <div id="feedContainer">
-            <!-- ডামি পোস্ট ১ -->
-            <div class="post-card">
-                <div class="post-header">
-                    <div class="user-info">
-                        <div class="avatar" style="background-color: #e41e3f;">স</div>
-                        <div>
-                            <h4>আহমাদুল্লাহ আশরাফ</h4>
-                            <span>১০ মিনিট আগে</span>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-ellipsis" style="color: var(--secondary-text); cursor: pointer;"></i>
-                </div>
-                <div class="post-body">
-                    আলহামদুলিল্লাহ! আজ আমার স্বপ্নের প্রজেক্ট IBook-এর প্রথম কোডিং ভার্সন তৈরি করলাম। শূন্য টাকায় কোডিং ছাড়া অসাধারণ অভিজ্ঞতা! 🚀
-                </div>
-                <div class="post-stats">
-                    <span><i class="fa-solid fa-thumbs-up" style="color: var(--primary-color);"></i> ৫ জন লাইক দিয়েছেন</span>
-                    <span>২টি কমেন্ট</span>
-                </div>
-                <div class="post-footer-actions">
-                    <button onclick="toggleLike(this)"><i class="fa-regular fa-thumbs-up"></i> লাইক</button>
-                    <button><i class="fa-regular fa-comment"></i> কমেন্ট</button>
-                    <button><i class="fa-solid fa-share"></i> শেয়ার</button>
-                </div>
-            </div>
+        <!-- রেজিস্ট্রেশন কার্ড -->
+        <div class="auth-card" id="register-form" style="display:none;">
+            <h2>IBook রেজিস্ট্রেশন</h2>
+            <input type="text" id="reg-username" placeholder="ইউজারনেম">
+            <input type="email" id="reg-email" placeholder="ইমেইল">
+            <input type="password" id="reg-password" placeholder="পাসওয়ার্ড">
+            <button onclick="registerUser()">রেজিস্টার</button>
+            <p onclick="toggleAuthMode(true)">লগইন করতে এখানে ক্লিক করুন</p>
         </div>
-
     </div>
 
-    <script>
-        // নতুন পোস্ট যোগ করার ফাংশন
-        function addNewPost() {
-            const textInput = document.getElementById('postText');
-            const postText = textInput.value.trim();
+    <!-- মেইন অ্যাপারিয়া -->
+    <div id="main-app">
+        <header>
+            <div class="logo"><h1>IBook</h1></div>
+            <div class="user-panel">
+                <span id="user-display-name"></span>
+                <button onclick="toggleMessenger()" style="background:var(--primary-color);color:white;border:none;padding:8px 15px;border-radius:5px;cursor:pointer;"><i class="fa-brands fa-facebook-messenger"></i> মেসেঞ্জার</button>
+                <button onclick="logoutUser()" style="background:#dc3545;color:white;border:none;padding:8px 15px;border-radius:5px;cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </header>
 
-            if(postText === "") {
-                alert("দয়া করে কিছু লিখে তারপর পোস্ট করুন!");
-                return;
-            }
-
-            const feedContainer = document.getElementById('feedContainer');
-
-            // নতুন পোস্টের HTML স্ট্রাকচার
-            const newPostHTML = `
-                <div class="post-card">
-                    <div class="post-header">
-                        <div class="user-info">
-                            <div class="avatar">আ</div>
-                            <div>
-                                <h4>আহমাদুল্লাহ আশরাফ</h4>
-                                <span>এই মাত্র</span>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-ellipsis" style="color: var(--secondary-text); cursor: pointer;"></i>
-                    </div>
-                    <div class="post-body">
-                        ${postText}
-                    </div>
-                    <div class="post-stats">
-                        <span><i class="fa-solid fa-thumbs-up" style="color: var(--primary-color);"></i> ১ জন</span>
-                        <span>০ কমেন্ট</span>
-                    </div>
-                    <div class="post-footer-actions">
-                        <button onclick="toggleLike(this)"><i class="fa-regular fa-thumbs-up"></i> লাইক</button>
-                        <button><i class="fa-regular fa-comment"></i> কমেন্ট</button>
-                        <button><i class="fa-solid fa-share"></i> শেয়ার</button>
-                    </div>
+        <div class="main-container">
+            <!-- পোস্ট তৈরির বক্স -->
+            <div class="card post-input">
+                <textarea id="post-text" rows="3" placeholder="あなたの考えを入力..."></textarea> <!-- Fixed placeholder glitch -->
+                <div class="post-footer">
+                    <button class="post-btn" onclick="createPost()">পোস্ট করুন</button>
                 </div>
-            `;
+            </div>
 
-            // ফিডের একদম উপরে নতুন পোস্ট যুক্ত করা
-            feedContainer.insertAdjacentHTML('afterbegin', newPostHTML);
-            
-            // ইনপুট বক্স খালি করা
-            textInput.value = "";
-        }
+            <!-- নিউজফিড -->
+            <div id="feed"></div>
+        </div>
 
-        // লাইক বাটন টগল করার ফাংশন
-        function toggleLike(btn) {
-            btn.classList.toggle('liked');
-            const icon = btn.querySelector('i');
-            if(btn.classList.contains('liked')) {
-                icon.classList.remove('fa-regular');
-                icon.classList.add('fa-solid');
-            } else {
-                icon.classList.remove('fa-solid');
-                icon.classList.add('fa-regular');
-            }
-        }
+        <!-- মেসেঞ্জার সাইডবার -->
+        <div id="messenger-sidebar">
+            <div class="chat-header">গ্লোবাল চ্যাট</div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-wrap">
+                <input type="text" id="chat-input" placeholder="লিখুন...">
+                <button onclick="sendMessage()" style="background:var(--primary-color);color:white;border:none;padding:5px 10px;margin-left:5px;border-radius:5px;cursor:pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
 
-        // ডার্ক মোড অন/অফ করার ফাংশন
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-        }
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCu_k1-YRgHYbJEDsFwpqFwEq7mhd9dpHU",
-  authDomain: "ibook-b4ae1.firebaseapp.com",
-  projectId: "ibook-b4ae1",
-  storageBucket: "ibook-b4ae1.firebasestorage.app",
-  messagingSenderId: "36196287150",
-  appId: "1:36196287150:web:8ae8d4f0ee5bdc1105a33f",
-  measurementId: "G-NDLH5TZ3KT"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-    </script>
 </body>
 </html>
