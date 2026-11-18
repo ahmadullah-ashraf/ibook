@@ -132,7 +132,7 @@
         .input-group { display: flex; gap: 6px; margin-top: 6px; }
         .input-group input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; background: var(--bg); font-size: 14px; }
 
-        /* এডমিন প্যানেল টেবিল/লিস্ট */
+        /* এডমিন প্যানেল */
         .admin-user-row {
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px; border-bottom: 1px solid var(--border); gap: 10px;
@@ -145,7 +145,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, setDoc, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCu_k1-YRgHYbJEDsFwpqFwEq7mhd9dpHU",
@@ -160,7 +159,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         let currentUser = null;
         let currentUserData = null;
@@ -185,8 +183,8 @@
                     name: name,
                     email: email,
                     photoURL: "",
-                    role: "user", // ডিফল্ট ইউজার
-                    status: "active", // active অথবা suspended
+                    role: "user",
+                    status: "active",
                     friends: [],
                     requestsReceived: [],
                     requestsSent: []
@@ -212,9 +210,8 @@
                 
                 if (snap.exists()) {
                     currentUserData = snap.data();
-                    // যদি ইউজার সাসপেন্ড বা বাতিল করা হয়
                     if (currentUserData.status === "suspended") {
-                        alert("আপনার অ্যাকাউন্টটি এডমিন কর্তৃক সাসপেন্ড বা বাতিল করা হয়েছে!");
+                        alert("আপনার অ্যাকাউন্টটি এডমিন কর্তৃক সাসপেন্ড করা হয়েছে!");
                         signOut(auth);
                         return;
                     }
@@ -282,7 +279,6 @@
                     avatarEl.innerHTML = `<div class="avatar-large">${currentUserData.name[0].toUpperCase()}</div>`;
                 }
 
-                // যদি ইউজার এডমিন হয়, তবে এডমিন ট্যাব দৃশ্যমান হবে
                 if (currentUserData.role === 'admin') {
                     document.getElementById('admin-tab-btn').style.display = 'block';
                     loadAdminPanel();
@@ -294,25 +290,25 @@
             });
         }
 
-        // প্রোফাইল ছবি আপলোড
-        window.uploadProfilePic = async () => {
+        // ফ্রিতে ইমেজ আপলোড (Base64 কনভার্শন)
+        window.uploadProfilePic = () => {
             const fileInput = document.getElementById('profile-pic-file');
             const file = fileInput.files[0];
             if (!file) return alert("দয়া করে একটি ছবি সিলেক্ট করুন!");
 
-            try {
-                const storageRef = ref(storage, `profile_pics/${currentUser.uid}_${Date.now()}`);
-                await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(storageRef);
-
-                await updateDoc(doc(db, "users", currentUser.uid), { photoURL: downloadURL });
-                alert("প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!");
-            } catch (err) {
-                alert("ছবি আপলোড ব্যর্থ হয়েছে: " + err.message);
-            }
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Image = e.target.result;
+                try {
+                    await updateDoc(doc(db, "users", currentUser.uid), { photoURL: base64Image });
+                    alert("প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!");
+                } catch (err) {
+                    alert("ছবি সেভ করতে সমস্যা হয়েছে: " + err.message);
+                }
+            };
+            reader.readAsDataURL(file);
         };
 
-        // নোটিফিকেশন
         async function sendNotification(targetUid, text) {
             if (targetUid === currentUser.uid) return;
             await addDoc(collection(db, "users", targetUid, "notifications"), {
@@ -356,7 +352,6 @@
             });
         }
 
-        // পোস্ট তৈরি ও ডিলিট (এডমিন যেকোনো পোস্ট মুছতে পারবে)
         window.createPost = async () => {
             const text = document.getElementById('post-text').value.trim();
             if (!text) return;
@@ -484,7 +479,6 @@
             });
         }
 
-        // এডমিন প্যানেল: রেজিস্টার্ড ইউজার লিস্ট ও কন্ট্রোল
         function loadAdminPanel() {
             onSnapshot(collection(db, "users"), (snapshot) => {
                 const adminList = document.getElementById('admin-users-list');
@@ -537,7 +531,6 @@
             alert(`ইউজার স্ট্যাটাস আপডেট করা হয়েছে!`);
         };
 
-        // সাধারণ ফ্রেন্ড লিস্ট ও সার্চ
         function loadAllUsers() {
             onSnapshot(collection(db, "users"), (snapshot) => {
                 const reqList = document.getElementById('friend-requests-list');
@@ -698,7 +691,7 @@
                 <div class="nav-tab" onclick="switchTab('friends', this)" title="ফ্রেন্ডস"><i class="fa-solid fa-user-group"></i><span class="header-badge" id="req-badge">0</span></div>
                 <div class="nav-tab" onclick="switchTab('notifications', this)" title="নোটিফিকেশন"><i class="fa-solid fa-bell"></i><span class="header-badge" id="notif-badge">0</span></div>
                 <div class="nav-tab" onclick="switchTab('profile', this)" title="প্রোফাইল"><i class="fa-solid fa-user"></i></div>
-                <!-- এডমিন ট্যাব (শুধুমাত্র এডমিন দেখতে পাবে) -->
+                <!-- এডমিন ট্যাব -->
                 <div class="nav-tab" id="admin-tab-btn" style="display:none;" onclick="switchTab('admin', this)" title="এডমিন প্যানেল"><i class="fa-solid fa-shield-halved"></i></div>
             </div>
         </header>
@@ -727,7 +720,7 @@
                 <div class="card"><h3 style="margin-bottom:10px;">নোটিফিকেশন</h3><div id="notifications-list"></div></div>
             </div>
 
-            <!-- ৪. প্রোফাইল ট্যাব (প্রোফাইল ছবি পরিবর্তনের সুবিধা) -->
+            <!-- ৪. প্রোফাইল ট্যাব -->
             <div id="view-profile" class="section-view">
                 <div class="card" style="text-align: center; padding: 25px;">
                     <div id="profile-avatar-display"></div>
