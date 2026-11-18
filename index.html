@@ -94,6 +94,7 @@
             width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
             background: var(--primary); color: white; display: flex; justify-content: center;
             align-items: center; font-weight: bold; font-size: 16px; margin-right: 10px; flex-shrink: 0;
+            cursor: pointer;
         }
         .avatar-large {
             width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
@@ -114,7 +115,7 @@
         /* পোস্ট কার্ড */
         .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .post-author-info { display: flex; align-items: center; }
-        .post-meta h4 { font-size: 15px; }
+        .post-meta h4 { font-size: 15px; cursor: pointer; color: var(--primary); }
         .post-meta span { font-size: 12px; color: var(--subtext); }
         .post-body { font-size: 15px; line-height: 1.5; margin-bottom: 12px; white-space: pre-wrap; }
         .post-stats { display: flex; justify-content: space-between; font-size: 13px; color: var(--subtext); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -127,7 +128,7 @@
         .comments-box { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; display: none; }
         .comment-item { margin-bottom: 10px; display: flex; gap: 8px; align-items: flex-start; }
         .comment-bubble { background: var(--bg); padding: 8px 12px; border-radius: 15px; max-width: 100%; }
-        .comment-bubble strong { font-size: 13px; display: block; }
+        .comment-bubble strong { font-size: 13px; display: block; cursor: pointer; color: var(--primary); }
         .comment-bubble p { font-size: 14px; }
         .input-group { display: flex; gap: 6px; margin-top: 6px; }
         .input-group input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; background: var(--bg); font-size: 14px; }
@@ -290,7 +291,7 @@
             });
         }
 
-        // ফ্রিতে ইমেজ আপলোড (Base64 কনভার্শন)
+        // প্রোফাইল ছবি আপলোড (Base64)
         window.uploadProfilePic = () => {
             const fileInput = document.getElementById('profile-pic-file');
             const file = fileInput.files[0];
@@ -307,6 +308,26 @@
                 }
             };
             reader.readAsDataURL(file);
+        };
+
+        // অন্য ইউজারের প্রোফাইল দেখার ফাংশন
+        window.viewUserProfile = async (uid) => {
+            const userSnap = await getDoc(doc(db, "users", uid));
+            if (!userSnap.exists()) return alert("ইউজার পাওয়া যায়নি!");
+            const uData = userSnap.data();
+
+            document.getElementById('profile-name-display').innerText = uData.name;
+            document.getElementById('profile-email-display').innerText = uData.email;
+            document.getElementById('profile-role-display').innerText = uData.role === 'admin' ? 'পদবী: এডমিন (Admin)' : 'পদবী: সাধারণ ইউজার';
+            
+            const avatarEl = document.getElementById('profile-avatar-display');
+            if (uData.photoURL) {
+                avatarEl.innerHTML = `<img src="${uData.photoURL}" class="avatar-large">`;
+            } else {
+                avatarEl.innerHTML = `<div class="avatar-large">${uData.name[0].toUpperCase()}</div>`;
+            }
+
+            switchTab('profile', null);
         };
 
         async function sendNotification(targetUid, text) {
@@ -357,7 +378,7 @@
             if (!text) return;
             await addDoc(collection(db, "posts"), {
                 authorId: currentUser.uid,
-                authorName: currentUser.displayName || "User",
+                authorName: currentUserData.name || currentUser.displayName || "User",
                 authorPhoto: currentUserData.photoURL || "",
                 content: text,
                 likes: [],
@@ -392,7 +413,7 @@
                     const isAdmin = currentUserData && currentUserData.role === 'admin';
                     const isAuthor = p.authorId === currentUser.uid;
 
-                    let authorImgHTML = p.authorPhoto ? `<img src="${p.authorPhoto}" class="avatar">` : `<div class="avatar">${(p.authorName || 'U')[0].toUpperCase()}</div>`;
+                    let authorImgHTML = p.authorPhoto ? `<img src="${p.authorPhoto}" class="avatar" onclick="viewUserProfile('${p.authorId}')">` : `<div class="avatar" onclick="viewUserProfile('${p.authorId}')">${(p.authorName || 'U')[0].toUpperCase()}</div>`;
 
                     const postDiv = document.createElement('div');
                     postDiv.className = 'card';
@@ -401,7 +422,7 @@
                             <div class="post-author-info">
                                 ${authorImgHTML}
                                 <div class="post-meta">
-                                    <h4>${p.authorName}</h4>
+                                    <h4 onclick="viewUserProfile('${p.authorId}')">${p.authorName}</h4>
                                     <span>${timeStr}</span>
                                 </div>
                             </div>
@@ -452,7 +473,8 @@
             const text = input.value.trim();
             if (!text) return;
             await addDoc(collection(db, "posts", pid, "comments"), {
-                authorName: currentUser.displayName || "User",
+                authorId: currentUser.uid,
+                authorName: currentUserData.name || currentUser.displayName || "User",
                 text: text,
                 createdAt: Date.now()
             });
@@ -470,7 +492,7 @@
                     list.innerHTML += `
                         <div class="comment-item">
                             <div class="comment-bubble">
-                                <strong>${c.authorName}</strong>
+                                <strong onclick="viewUserProfile('${c.authorId || ''}')">${c.authorName}</strong>
                                 <p>${c.text}</p>
                             </div>
                         </div>
@@ -488,7 +510,7 @@
                 snapshot.forEach((docSnap) => {
                     totalCount++;
                     const u = docSnap.data();
-                    let uImg = u.photoURL ? `<img src="${u.photoURL}" class="avatar">` : `<div class="avatar">${u.name[0].toUpperCase()}</div>`;
+                    let uImg = u.photoURL ? `<img src="${u.photoURL}" class="avatar" onclick="viewUserProfile('${u.uid}')">` : `<div class="avatar" onclick="viewUserProfile('${u.uid}')">${u.name[0].toUpperCase()}</div>`;
                     
                     const isSuspended = u.status === 'suspended';
                     const isAdmin = u.role === 'admin';
@@ -498,7 +520,7 @@
                             <div class="admin-user-info">
                                 ${uImg}
                                 <div>
-                                    <strong>${u.name}</strong><br>
+                                    <strong onclick="viewUserProfile('${u.uid}')" style="cursor:pointer; color:var(--primary);">${u.name}</strong><br>
                                     <span style="font-size:12px; color:var(--subtext);">${u.email} | রোল: ${isAdmin ? 'এডমিন' : 'ইউজার'}</span>
                                 </div>
                             </div>
@@ -554,13 +576,13 @@
                     const u = docSnap.data();
                     if (u.uid === currentUser.uid || u.status === 'suspended') return;
 
-                    let uImg = u.photoURL ? `<img src="${u.photoURL}" class="avatar">` : `<div class="avatar">${u.name[0].toUpperCase()}</div>`;
+                    let uImg = u.photoURL ? `<img src="${u.photoURL}" class="avatar" onclick="viewUserProfile('${u.uid}')">` : `<div class="avatar" onclick="viewUserProfile('${u.uid}')">${u.name[0].toUpperCase()}</div>`;
 
                     if (myReqReceived.includes(u.uid)) {
                         hasRequests = true;
                         reqList.innerHTML += `
                             <div class="user-row">
-                                <div class="admin-user-info">${uImg}<strong>${u.name}</strong></div>
+                                <div class="admin-user-info">${uImg}<strong onclick="viewUserProfile('${u.uid}')" style="cursor:pointer; color:var(--primary);">${u.name}</strong></div>
                                 <div>
                                     <button class="btn-primary" onclick="acceptRequest('${u.uid}')">কনফার্ম</button>
                                     <button class="btn-gray" onclick="rejectRequest('${u.uid}')">মুছুন</button>
@@ -571,7 +593,7 @@
                         hasFriends = true;
                         friendsList.innerHTML += `
                             <div class="user-row">
-                                <div class="admin-user-info">${uImg}<strong>${u.name}</strong></div>
+                                <div class="admin-user-info">${uImg}<strong onclick="viewUserProfile('${u.uid}')" style="cursor:pointer; color:var(--primary);">${u.name}</strong></div>
                                 <button class="btn-primary" onclick="openChatWith('${u.uid}', '${u.name}')"><i class="fa-brands fa-facebook-messenger"></i> মেসেজ</button>
                             </div>
                         `;
@@ -584,7 +606,7 @@
                         const isSent = myReqSent.includes(u.uid);
                         peopleList.innerHTML += `
                             <div class="user-row">
-                                <div class="admin-user-info">${uImg}<strong>${u.name}</strong></div>
+                                <div class="admin-user-info">${uImg}<strong onclick="viewUserProfile('${u.uid}')" style="cursor:pointer; color:var(--primary);">${u.name}</strong></div>
                                 ${isSent ? `<button class="btn-gray">রিকোয়েস্ট পাঠানো হয়েছে</button>` : `<button class="btn-primary" onclick="sendRequest('${u.uid}')">অ্যাড ফ্রেন্ড</button>`}
                             </div>
                         `;
